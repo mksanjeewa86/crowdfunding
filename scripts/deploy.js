@@ -1,8 +1,8 @@
 const main = async () => {
-  const Greeter = await hre.ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Greeter");
-  await greeter.deployed();
-  console.log("Greeter deployed to:", greeter.address);
+  const ProjectFactory = await hre.ethers.getContractFactory("ProjectFactory");
+  const project = await ProjectFactory.deploy();
+  await project.deployed();
+  console.log("ProjectFactory deployed to:", project.address);
 }
 
 const runMain = () => {

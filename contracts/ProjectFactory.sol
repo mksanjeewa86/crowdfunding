@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "./Project.sol";
 
@@ -9,15 +9,13 @@ contract ProjectFactory {
 
   event ProjectStarted(
     address contractAddress,
-    address projectStarter,
-    string projectTitle,
-    string projectDesc,
+    address owner,
     uint256 goalAmount
   );
 
-  function startProject(string calldata title, string calldata description, uint256 amountToRaise) external {
-    Project project = new Project(payable(msg.sender), title, description, amountToRaise);
-    emit ProjectStarted(address(project), msg.sender, title, description, amountToRaise);
+  function startProject(address _owner, uint256 _amountToRaise) external {
+    Project project = new Project(_owner, _amountToRaise);
+    emit ProjectStarted(address(project), msg.sender, _amountToRaise);
     projectFactory.push(project);
   }
 
