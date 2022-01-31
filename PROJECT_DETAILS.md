@@ -14,8 +14,8 @@ contributing
                                                               => gets cancelled                         🆗
 
 contributer badges
-        => receives a badge if their **total contribution** is at least 1 ETH                           ❌
-        => One address can receive multiple badges (but should only receive 1 badge per 1 ETH)          ❌
+        => receives a badge if their **total contribution** is at least 1 ETH                           🆗
+        => One address can receive multiple badges (but should only receive 1 badge per 1 ETH)          🆗
 
 project is not fully funded within 30 days
         => The project goal is failed                                                                   🆗
@@ -31,7 +31,3 @@ creator can choose to cancel their project
         => before the 30 days are over                                                                  🆗
         => same effect as a project failing                                                             🆗
 
-
-
-total contribution / 1 eth => 1 badge
-3 eth / 1 eth => 3 badge

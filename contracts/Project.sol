@@ -6,23 +6,35 @@ import "./Counters.sol";
 
 contract Project is ERC721 {
 
+  enum State {
+    Active,
+    Cancelled,
+    Expired,
+    Successful
+  }
+
   modifier isOwner() {
     require(msg.sender == creator, "only project creator can run this action");
     _;
   }
 
+  modifier isNotExpired() {
+    require(block.timestamp < expireTimestamp, "this project is expired");
+    _;
+  }
+
   modifier isActive() {
-    require(state == 0, "project is not active");
+    require(state == State.Active, "project is not active");
     _;
   }
 
   modifier isSuccessful() {
-    require(state == 3, "project is not successful");
+    require(state == State.Successful, "project is not successful");
     _;
   }
 
   modifier isCanceledOrExpired() {
-    require(state == 1 || state == 2, "project is not canceled or expired");
+    require(state == State.Cancelled || state == State.Expired, "project is not canceled or expired");
     _;
   }
 
@@ -39,7 +51,7 @@ contract Project is ERC721 {
   address payable public creator;
   uint256 public amountGoal;
   uint256 public expireTimestamp;
-  uint public state = 0; // 0-active, 1-canceled, 2-expired, 3-finished
+  State public state;
   uint256 public currentBalance;
 
   // mappings
@@ -56,12 +68,12 @@ contract Project is ERC721 {
     creator = payable(owner);
     amountGoal = goalAmount;
     currentBalance = 0;
-    state = 0;
+    state = State.Active;
     expireTimestamp = block.timestamp + 30 days;
   }
 
   // functions
-  function contribute() external payable isActive {
+  function contribute() external payable isActive isNotExpired {
     require(msg.value >= 0.01 ether, "minimum contribution is 0.01 ether");
     contributions[msg.sender] += msg.value;
     currentBalance += msg.value;
@@ -71,22 +83,22 @@ contract Project is ERC721 {
 
   function checkIfFundingCompleteOrExpired() internal {
     if (currentBalance >= amountGoal) {
-      state = 3;
+      state = State.Successful;
     } else if (block.timestamp >= expireTimestamp) {
-      state = 2;
+      state = State.Expired;
     }
   }
 
   function cancelProject() external isOwner isActive {
-    state = 1;
+    state = State.Cancelled;
   }
 
-  function payOut() external payable isOwner isSuccessful {
-    require(currentBalance >= msg.value, "cannot withdraw this amount");
-    (bool success, ) = creator.call{ value: msg.value }("");
+  function payOut(uint256 _amount) external payable isOwner isSuccessful {
+    require(currentBalance >= _amount, "cannot withdraw this amount");
+    (bool success, ) = creator.call{ value: _amount }("");
     require(success, "withdraw failed");
-    currentBalance -= msg.value;
-    emit Withdraw(creator, msg.value);
+    currentBalance -= _amount;
+    emit Withdraw(creator, _amount);
   }
 
   function getRefund() external payable isCanceledOrExpired {

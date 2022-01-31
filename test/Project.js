@@ -128,7 +128,7 @@ describe("Project", () => {
       await project.connect(account2).contribute({ value: ethers.utils.parseEther("11") });
       const state = await project.state();
       expect(state).to.equal(3);
-      await project.connect(account1).payOut({ value: ethers.utils.parseEther("11") });
+      await project.connect(account1).payOut(ethers.utils.parseEther("11"));
       const currentBalance = await project.currentBalance();
       expect(currentBalance).to.equal(ethers.utils.parseEther("0"));
     });
@@ -137,7 +137,7 @@ describe("Project", () => {
       await project.connect(account2).contribute({ value: ethers.utils.parseEther("11") });
       const state = await project.state();
       expect(state).to.equal(3);
-      await project.connect(account1).payOut({ value: ethers.utils.parseEther("5") });
+      await project.connect(account1).payOut(ethers.utils.parseEther("5"));
       const currentBalance = await project.currentBalance();
       expect(currentBalance).to.equal(ethers.utils.parseEther("6"));
     });
@@ -147,7 +147,7 @@ describe("Project", () => {
       const state = await project.state();
       expect(state).to.equal(3);
       await expect(
-        project.connect(account1).payOut({ value: ethers.utils.parseEther("15") })
+        project.connect(account1).payOut(ethers.utils.parseEther("15"))
       ).to.be.revertedWith("cannot withdraw this amount");
     });
     it("try to withdraw by other than the project owner and final balance should not changed", async () => {
@@ -156,7 +156,7 @@ describe("Project", () => {
       const state = await project.state();
       expect(state).to.equal(3);
       await expect(
-        project.connect(account2).payOut({ value: ethers.utils.parseEther("5") })
+        project.connect(account2).payOut(ethers.utils.parseEther("5"))
       ).to.be.revertedWith("only project creator can run this action");
       const currentBalance = await project.currentBalance();
       expect(currentBalance).to.equal(ethers.utils.parseEther("11"));
@@ -167,7 +167,7 @@ describe("Project", () => {
       const state = await project.state();
       expect(state).to.equal(0);
       await expect(
-        project.connect(account1).payOut({ value: ethers.utils.parseEther("5") })
+        project.connect(account1).payOut(ethers.utils.parseEther("5"))
       ).to.be.revertedWith("project is not successful");
     });
     it("try to withdraw from cancelled project", async () => {
@@ -177,7 +177,7 @@ describe("Project", () => {
       const state = await project.state();
       expect(state).to.equal(1);
       await expect(
-        project.connect(account1).payOut({ value: ethers.utils.parseEther("5") })
+        project.connect(account1).payOut(ethers.utils.parseEther("5"))
       ).to.be.revertedWith("project is not successful");
       const currentBalance = await project.currentBalance();
       expect(currentBalance).to.equal(ethers.utils.parseEther("5"));
@@ -185,7 +185,7 @@ describe("Project", () => {
     it("emit Withdraw event", async () => {
       const project = await deployProject();
       await project.connect(account2).contribute({ value: ethers.utils.parseEther("11") });
-      await expect(project.connect(account1).payOut({ value: ethers.utils.parseEther("5") })
+      await expect(project.connect(account1).payOut(ethers.utils.parseEther("5"))
       ).to.emit(project, "Withdraw").withArgs(account1.address, ethers.utils.parseEther("5"));
     });
   });
