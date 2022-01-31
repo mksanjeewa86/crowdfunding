@@ -230,54 +230,33 @@ describe("Project", () => {
     });
   });
   describe("NFT", () => {
-    it("contribute more than 1 ether and try to mint NFT", async () => {
+    it("contribute more than 1 ether and get address balance", async () => {
       const project = await deployProject();
       await project.connect(account1).contribute({ value: ethers.utils.parseEther("1.4") });
-      await project.connect(account1).mintNFT();
       const accountNFTBalance = await project.balanceOf(account1.address);
       expect(accountNFTBalance).to.equal(1);
     });
     it("mint multiple NFTs", async () => {
       const project = await deployProject();
       await project.connect(account1).contribute({ value: ethers.utils.parseEther("2.4") });
-      await project.connect(account1).mintNFT();
-      await project.connect(account1).mintNFT();
       const accountNFTBalance = await project.balanceOf(account1.address);
       expect(accountNFTBalance).to.equal(2);
     });
-    it("mint multiple NFTs more than available", async () => {
-      const project = await deployProject();
-      await project.connect(account1).contribute({ value: ethers.utils.parseEther("2.4") });
-      await project.connect(account1).mintNFT();
-      await project.connect(account1).mintNFT();
-      await expect(
-        project.connect(account1).mintNFT()
-      ).to.be.revertedWith("mintable NFTs not available");
-      const accountNFTBalance = await project.balanceOf(account1.address);
-      expect(accountNFTBalance).to.equal(2);
-    });
-    it("contribute less than 1 ether and try to mint NFT", async () => {
+    it("contribute less than 1 ether and get address balance and is should be 0", async () => {
       const project = await deployProject();
       await project.connect(account2).contribute({ value: ethers.utils.parseEther("0.01") });
-      await expect(
-        project.connect(account2).mintNFT()
-      ).to.be.revertedWith("mintable NFTs not available");
       const accountNFTBalance = await project.balanceOf(account2.address);
       expect(accountNFTBalance).to.equal(0);
     });
-    it("contribute multiple times more than 1 ether and try to mint NFT", async () => {
+    it("contribute multiple times more than 1 ether and get address balanceT", async () => {
       const project = await deployProject();
       await project.connect(account2).contribute({ value: ethers.utils.parseEther("0.5") });
       await project.connect(account2).contribute({ value: ethers.utils.parseEther("0.6") });
-      await project.connect(account2).mintNFT();
       const accountNFTBalance = await project.balanceOf(account2.address);
       expect(accountNFTBalance).to.equal(1);
     });
-    it("try to mint NFT without contribution", async () => {
+    it("get address balance without contribution", async () => {
       const project = await deployProject();
-      await expect(
-        project.connect(account2).mintNFT()
-      ).to.be.revertedWith("mintable NFTs not available");
       const accountNFTBalance = await project.balanceOf(account2.address);
       expect(accountNFTBalance).to.equal(0);
     });
@@ -285,7 +264,6 @@ describe("Project", () => {
       const project = await deployProject();
       await project.connect(account2).contribute({ value: ethers.utils.parseEther("1.5") });
       await project.connect(account1).cancelProject();
-      await project.connect(account2).mintNFT();
       const accountNFTBalance = await project.balanceOf(account2.address);
       expect(accountNFTBalance).to.equal(1);
     });

@@ -38,12 +38,6 @@ contract Project is ERC721 {
     _;
   }
 
-  modifier hasMintableNFT() {
-    uint256 mintable = contributions[msg.sender] / 1 ether - mintedNFTs[msg.sender];
-    require(mintable > 0, "mintable NFTs not available");
-    _;
-  }
-
   using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
 
@@ -77,6 +71,13 @@ contract Project is ERC721 {
     require(msg.value >= 0.01 ether, "minimum contribution is 0.01 ether");
     contributions[msg.sender] += msg.value;
     currentBalance += msg.value;
+    uint256 mintable = contributions[msg.sender] / 1 ether - mintedNFTs[msg.sender];
+    if (mintable > 0) {
+      for (uint i = 0; i < mintable; i++) {
+        mintNFT(msg.sender);
+        mintedNFTs[msg.sender] += 1;
+      }
+    }
     emit FundingReceived(msg.sender, msg.value);
     checkIfFundingCompleteOrExpired();
   }
@@ -111,10 +112,9 @@ contract Project is ERC721 {
     emit Refund(msg.sender, amountToRefund);
   }
 
-  function mintNFT() external hasMintableNFT {
+  function mintNFT(address _contributor) internal {
     uint256 id = _tokenIds.current();
-    _safeMint(msg.sender, id);
-    mintedNFTs[msg.sender] += 1;
+    _safeMint(_contributor, id);
     _tokenIds.increment();
   }
 }
